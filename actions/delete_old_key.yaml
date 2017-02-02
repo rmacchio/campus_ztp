@@ -1,0 +1,13 @@
+---
+name: delete_old_key
+runner_type: run-local
+description: "deletes existing ssh key for device"
+enabled: true
+parameters:
+  device:
+    type: string
+    description: "ip or hostname of the switch"
+    required: true
+  cmd:
+    default: "echo 'password' | sudo -S ssh-keygen -R {{device}}"
+

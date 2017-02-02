@@ -11,37 +11,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import json
-from lib import actions, ztp_utils
-
+import json, os, time
+import re
+from lib import actions
+from lib import ztp_utils, Secure_Copy
 
 class GetFlashAction(actions.SessionAction):
     def __init__(self, config):
         super(GetFlashAction, self).__init__(config)
+        self._config_archive_dir=self.config['config_backup_dir']
 
     def run(self, via, device, username='', password='', enable_username='', enable_password=''):
         ztp_utils.replace_default_userpass(self, username, password,
                                            enable_username, enable_password)
         session = ztp_utils.start_session(device, self._username, self._password,
-                                          self._enable_username, self._enable_password, via)
+                                          self._enable_username, self._enable_password, 'ssh')
 
-        command = 'show module | include ^U'
+        command = 'wr mem'
         (success, results) = ztp_utils.send_commands_to_session(session, command, conf_mode=False)
+        print results
+        # grab the config
+        config_dir='%s/%s' % (self._config_archive_dir, device)
+        print config_dir
+        try:
+            if not os.path.exists(config_dir):
+                os.makedirs(config_dir)
+        except IOError:
+            sys.sterr.write("Could not create directory: ' %s' \r\n" % device)
+            return(False,"Failed")
+        scp=Secure_Copy.Secure_Copy(device,self._username,self._password)
+        timestamp=int(time.time())
+        filename= '%s/%s_%s.cfg' % (config_dir,device,timestamp)
+        if scp.get_file('RunConfig', filename):
+            return(True,"Success")
+        return(False,"Failed")
 
-        if success:
-            # Built JSON Record from parsed results
-            modules = {}
-            last_unit = ''
-            for line in results[0]['output'][1:]:
-                unit = line[0:7].split(':')[0][1:]
-                module = line[0:7].split(':')[1][1:].rstrip()
-                module_name = line[7:50].rstrip()
-                ports = line[50:-1].split()[1]
-                if unit != last_unit:
-                    modules[unit] = []
-                modules[unit].append({"module": module, "name": module_name, "ports": ports})
-                last_unit = unit
-
-            return (True, json.dumps(modules))
-
-        return (False, "Failed")

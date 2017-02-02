@@ -71,5 +71,24 @@ campus_ztp.initial_configuration_mistral:
       input:
         device: '<% $.client_ip %>'
         excel_key: '<% $.remote_id %>_<% $.circuit_id %>'
-        
+      publish:
+        prod_ip: <% task(transfer_ztp_configuration).result.result[2] %>        
+      on-success:
+        - delay_again
+    delay_again:
+      action: campus_ztp.delay
+      input: 
+        seconds: 90
+      on-success:
+        - delete_old_key
+    delete_old_key:
+      action: campus_ztp.delete_old_key
+      input:
+        device: '<% $.prod_ip %>'
+      on-success:
+        - login
+    login:
+      action: campus_ztp.login
+      input:
+        device: '<% $.prod_ip %>'
 

@@ -1,0 +1,25 @@
+!
+! This is configuration template A 
+!
+
+hostname {{host_name}}
+
+interface management 1
+ ip address {{int_management_1_address}} {{int_management_1_mask}}
+
+vlan 2 name Mgmt
+ tag {{uplink_1}}
+
+snmp-server location {{snmp_location}}
+snmp-server contact {{snmp_contact}}
+
+vlan {{user_vlan}} name User_Vlan
+ tagged {{uplink_1}} 
+ untagged {{user_vlan_ports}}
+vlan {{voice_vlan}} name Voice_Vlan
+ tagged {{uplink_1}}
+ untagged {{voice_vlan_ports}}
+vlan {{wireless_vlan}} name Wireless_Vlan
+ tagged {{uplink_1}}
+ untagged {{wireless_vlan_ports}}
+

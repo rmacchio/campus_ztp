@@ -1,0 +1,39 @@
+---
+name: "login"
+runner_type: "run-python"
+description: "gets the version information as a json record"
+enabled: true
+entry_point: "login.py"
+parameters:
+  device:
+    type: "string"
+    description: "ip or hostname of the switch"
+    required: true
+  username:
+    type: "string"
+    description: "override configured username"
+    required: false
+    default: "{{st2kv.system.campus_ztp.prod_username|decrypt_kv}}"
+  password:
+    type: "string"
+    description: "override configured password"
+    required: false
+    default: "{{st2kv.system.campus_ztp.prod_password|decrypt_kv}}"
+  enable_username:
+    type: "string"
+    description: "override configured enable username"
+    required: false
+    default: "{{st2kv.system.campus_ztp.prod_username|decrypt_kv}}"
+  enable_password:
+    type: "string"
+    description: "override configured enable password"
+    required: false
+    default: "{{st2kv.system.campus_ztp.prod_password|decrypt_kv}}"
+  via:
+    type: "string"
+    description: "what way?"
+    enum:
+      - "telnet"
+      - "ssh"
+    default: "ssh"
+  

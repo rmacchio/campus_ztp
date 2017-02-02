@@ -28,6 +28,8 @@ class IsImageCurrentAction(Action):
         data = json.loads(images)
 
         hardware = data['hardware'].split('-')[0]
+        if re.search('^FCX.*',hardware):
+            hardware='FCX'
         self._image=self._images['Brocade'][hardware]
 
         # Strip off everything but numbers and patch

@@ -32,7 +32,7 @@ class TransferZTPConfigurationAction(actions.SessionAction):
         ztp_utils.replace_default_userpass(self, username, password,
                                            enable_username, enable_password)
 
-        (success, config) = ztp_utils.create_configuration(excel_key, self._excel_file,
+        (success, config, prod_ip) = ztp_utils.create_configuration(excel_key, self._excel_file,
                                                            self._template_dir,
                                                            additional_variables)
 
@@ -58,7 +58,7 @@ class TransferZTPConfigurationAction(actions.SessionAction):
                     if scp.send_file(self._filename, 'StartConfig'):
                         session.reload(writemem=False)
                         os.remove(self._filename)
-                        return (True, "Success")
+                        return (True, "Success", prod_ip)
 
                     os.remove(self._filename)
                     

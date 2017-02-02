@@ -53,3 +53,11 @@ class SessionAction(Action):
         key = client.keys.get_by_name('campus_ztp.enable_password')
         if key:
             self._enable_password = symmetric_decrypt(crypto_key, key.value)
+
+        key = client.keys.get_by_name('campus_ztp.prod_username')
+        if key:
+            self._prod_username = symmetric_decrypt(crypto_key, key.value)
+
+        key = client.keys.get_by_name('campus_ztp.prod_password')
+        if key:
+            self._prod_password = symmetric_decrypt(crypto_key, key.value)

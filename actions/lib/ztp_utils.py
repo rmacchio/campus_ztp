@@ -29,18 +29,22 @@ def process_template(template_file_name, template_dir, variables):
                              (template_dir, template_file_name))
             return (False, "Failed")
         parse.set_variables(variables)
-
+        prod_ip=variables['switch_ip']
         # Check to make sure all variables have answers
         parse_success = True
         for v in parse.get_required_variables():
             if (not variables) or (variables and v not in variables):
-                sys.stderr.write("Could not find variable '%s' for template '%s'\r\n" %
-                                 (v, template_file_name))
-                parse_success = False
+                # not sure why but 'range' gets picked up as a required variable even though it's not
+                if v=='range':
+                    pass
+                else:
+                    sys.stderr.write("Could not find variable '%s' for template '%s'\r\n" %
+                                     (v, template_file_name))
+                    parse_success = False
         if not parse_success:
             return (False, "Failed")
 
-        return (True, parse.get_parsed_lines())
+        return (True, parse.get_parsed_lines(),prod_ip)
     else:
         return (False, "Failed")
 
@@ -48,8 +52,20 @@ def process_template(template_file_name, template_dir, variables):
 def create_configuration(device, excel_file, template_dir, additional_variables):
     excel = Excel_Reader.Excel_Reader(excel_file)
     template_file_name = excel.get_template_name_for_key(device)
-    variables = excel.get_variables_for_key(device)
+    variables = json.loads(json.dumps(excel.get_variables_for_key(device)))
 
+    # convert vlan_list and vlan_name_list to vlans[i] for iteration
+    tmp_vlans=[]
+    tmp_names=[]
+    tmp_vlans=variables['vlan_list'].split()
+    tmp_names=variables['vlan_name_list'].split()
+    if len(tmp_vlans)!=len(tmp_names):
+        sys.stderr.write("The vlan list and name list do not have the same number of entries.")
+        return (False, "Failed")
+    tmp_vlan=[]
+    for i in range(len(tmp_vlans)):
+        tmp_vlan.append({'id':tmp_vlans[i],'name':tmp_names[i]})
+    variables['vlans']=tmp_vlan
     # add additional variables
     try:
         additional_variables = json.loads(additional_variables)
@@ -65,7 +81,6 @@ def create_configuration(device, excel_file, template_dir, additional_variables)
 
     # update the dictionary file with the new variables
     variables.update(additional_variables)
-
     return process_template(template_file_name, template_dir, variables)
 
 def get_variables_for_key(excel_key, excel_file, variables):

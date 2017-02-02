@@ -1,21 +1,29 @@
 ---
 template_dir: "/opt/stackstorm/packs/campus_ztp/templates"
-excel_file: "/opt/stackstorm/packs/campus_ztp/sample.xlsx"
+excel_file: "/opt/stackstorm/packs/campus_ztp/test_template2.xlsx"
 temp_dir: "/opt/stackstorm/packs/campus_ztp/tmp"
 config_backup_dir: "/opt/stackstorm/packs/campus_ztp/config_archives"
+
+#username: "admin"
+#password: "brocade"
+#enable_username: "admin"
+#enable_password: "brocade"
 
 # Used for the SCP of ZTP configuration to device
 ztp_username: "admin"
 ztp_password: "brocade"
+prod_username: "test"
+prod_password: "password"
 
-tftp_server: "10.0.0.38"
+tftp_server: "192.168.1.66"
 
 logging_watch_sensor:
   logging_paths: "/var/log/switches.log"
 
-# List of Boot images per vender, per device type
+# List of Boot images per vendor, per device type
 boot_images:
   Brocade:
+    FCX: "grz10100.bin"
     ICX7250: "spz10106.bin"
     ICX7450: "spz10106.bin"
     ICX7750: "swz10106.bin"
@@ -23,6 +31,7 @@ boot_images:
 # List of Software images per vender, per function, per device type
 software_images:
   Brocade:
+    FCX: "fcxs08030k.bin"
     ICX7250: "sps08040a.bin"
     ICX7450: "sps08040a.bin"
     ICX7750: "sws08040a.bin"

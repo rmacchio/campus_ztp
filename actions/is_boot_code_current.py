@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import re
 import json
 from st2actions.runners.pythonrunner import Action
 from lib import ztp_utils
@@ -27,6 +28,9 @@ class IsBootCodeCurrentAction(Action):
         data = json.loads(images)
 
         hardware = data['hardware'].split('-')[0]
+        if re.search('^FCX.*',hardware):
+            hardware='FCX'
+
         self._boot_image=self._boot_images['Brocade'][hardware]
 
         # Strip off everything but numbers and patch
